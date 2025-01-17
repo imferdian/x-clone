@@ -34,7 +34,6 @@ export const register = async (req, res) => {
         })
 
         if(newUser) {
-            generateTokenAndCookie(newUser._id, res);
             await newUser.save();
             res.status(201).json({
                 success: true,
