@@ -1,8 +1,8 @@
-import User from "../models/user.model.js";
-import { v2 as cloudinary } from 'cloudinary';
-
 // Model Database
+import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
+
+import { v2 as cloudinary } from 'cloudinary';
 import bcrypt from "bcryptjs";
 
 
@@ -149,7 +149,6 @@ export const updateUser = async (req, res) => {
             if(user.profileImg){
                 await cloudinary.uploader.destroy(user.profileImg.split('/').pop().split('.')[0])
             }
-
             const uploadedResponse = await cloudinary.uploader.upload(profileImg);
             profileImg = uploadedResponse.secure_url;
         }
