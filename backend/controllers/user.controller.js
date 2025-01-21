@@ -30,11 +30,11 @@ export const followUnfollowUser = async (req, res) => {
         const currentUser = await User.findById(req.user._id);
 
         if (id === req.user._id.toString()) {
-            return res.status(400).json({ error: "You can't follow/unfollow yourself" });
+            return res.status(400).json({ error: "Kamu tidak bisa lah meng-follow diri kamu sendiri!" });
         }
 
         if(!userToModify || !currentUser) {
-            return res.status(404).json({error: 'User not found'});
+            return res.status(404).json({error: 'User tidak ditemukan, nih'});
         }
 
         const isFollowing = currentUser.following.includes(id);
@@ -43,7 +43,7 @@ export const followUnfollowUser = async (req, res) => {
             // Unfollow user
             await User.findByIdAndUpdate(id, {$pull: {followers: req.user._id}})
             await User.findByIdAndUpdate(req.user._id, {$pull: {following: id}})
-            res.status(200).json({ message: 'User unfollowed successfully' });
+            res.status(200).json({ message: 'Berhasil meng-unfollow (parahh)' });
         }else{
             // Follow user
             await User.findByIdAndUpdate(id, {$push: {followers: req.user._id}})
@@ -57,7 +57,7 @@ export const followUnfollowUser = async (req, res) => {
 
             await newNotification.save();
 
-            res.status(200).json({ message: 'User followed successfully' });
+            res.status(200).json({ message: 'Berhasil meng-follow' });
         }
 
     }catch (err) {
@@ -108,17 +108,17 @@ export const updateUser = async (req, res) => {
 
     try {
         const user = await User.findById(userId);
-        if(!user) return res.status(404).json({error: 'User not found'});
+        if(!user) return res.status(404).json({error: 'User tidak ditemukan, nih'});
 
         if(email){
             const isEmailTaken = await User.findOne({
                 email,
                 _id: {$ne: userId},
             }); 
-            if(isEmailTaken) return res.status(400).json({error: 'Email already taken'});
+            if(isEmailTaken) return res.status(400).json({error: 'Email sudah dipakai, heyy!!'});
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if(!emailRegex.test(email)) return res.status(400).json({error: 'Invalid email address'});
+            if(!emailRegex.test(email)) return res.status(400).json({error: 'Alamat email kamu yang benar dong!!'});
         }
 
         if(username){
@@ -126,19 +126,19 @@ export const updateUser = async (req, res) => {
                 username,
                 _id: {$ne: userId},
             });
-            if(isUsernameTaken) return res.status(400).json({error: 'Username already taken'});
+            if(isUsernameTaken) return res.status(400).json({error: 'Username itu udah dipakai'});
         }
 
         if((!currentPassword && newPassword) || (!newPassword && currentPassword)) {
-            return res.status(400).json({error: 'Please provide both current password or new password'});
+            return res.status(400).json({error: 'Isilah password lama dan password barunya, heyy!!'});
 
         }
 
         if(currentPassword && newPassword) {
             const isMatch = await bcrypt.compare(currentPassword, user.password);
-            if(!isMatch) return res.status(400).json({ error: 'Current password is incorect'})
+            if(!isMatch) return res.status(400).json({ error: 'Password lama kamu salah, nih. HMMM!!'})
             if(newPassword.length < 6) {
-                return res.status(400).json({error: 'Password must be at least 6 characters'});
+                return res.status(400).json({error: 'Password kamu minimal harus 6 karakter ya!!'});
             }
 
             const salt = await bcrypt.genSalt(10);

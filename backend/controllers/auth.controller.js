@@ -7,21 +7,21 @@ export const register = async (req, res) => {
         const {fullName, username, email, password} = req.body;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if(!emailRegex.test(email)) {
-            return res.status(400).json({error: 'Invalid email address'});
+            return res.status(400).json({error: 'Alamat emailnya salah oyy!'});
         }
 
         const existingUser = await User.findOne({ username });
         if(existingUser) {
-            return res.status(400).json({error: 'User already exists'});
+            return res.status(400).json({error: 'Username itu udah dipake!'});
         }
 
         const existingEmail = await User.findOne({ email });
         if(existingEmail) {
-            return res.status(400).json({error: 'Email already exists'});
+            return res.status(400).json({error: 'Email itu udah pernah kedaftar, hey!'});
         }
 
         if(password.length < 6){
-            return res.status(400).json({error: 'Password must be at least 6 characters'});
+            return res.status(400).json({error: 'Password kamu minimal harus 6 karakter ya!!'});
         }
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(password, salt);
@@ -72,7 +72,7 @@ export const login = async (req, res) => {
         if(!user || !isPasswordValid) {
             return res.status(400).json({
                 success: false,
-                error: 'Invalid username or password'
+                error: 'Username atau password SALAH!!'
             });
         }
 
@@ -105,7 +105,7 @@ export const logout = async (req, res) => {
         res.cookie('jwt', '', {maxAge: 0})
         res.status(200).json({
             success: true,
-            message: 'Logged out successfully'
+            message: 'Yeay, Berhasil Logout!'
         })
     }catch(err){
         console.log('Error in logout controller', err.message)

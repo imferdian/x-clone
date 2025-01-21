@@ -10,10 +10,10 @@ export const createPost = async (req, res) => {
         const userId = req.user._id.toString();
 
         const user = await User.findById(userId);
-        if(!user) return res.status(404).json({error: 'User not found'});
+        if(!user) return res.status(404).json({error: 'User tidak ditemukan'});
 
         if(!text && !img){
-            return res.status(404).json({error: 'Post must have text or image'});
+            return res.status(404).json({error: 'Kalau mau ngepost setidaknya ada text atau gambarlah, oyy!!'});
         }
 
         if(img){
@@ -41,11 +41,11 @@ export const deletePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         if(!post){
-            return res.status(404).json({ error: 'Post not found'});
+            return res.status(404).json({ error: 'Post tidak ditemukan'});
         }
 
         if(post.user.toString() !== req.user._id.toString()) {
-            return res.status(401).json({error: 'You are not authorized to delete this post'});
+            return res.status(401).json({error: 'Kamu tidak memiliki wewenang untuk menghapus post ini!!'});
         }
 
         if(post.img){
@@ -54,7 +54,7 @@ export const deletePost = async (req, res) => {
         }
 
         await Post.findByIdAndDelete(req.params.id);
-        res.status(200).json({message: 'Post deleted successfully'})
+        res.status(200).json({message: 'Yeay, berhasil menghapus post'})
 
     }catch (err) {
         console.log('Error in deletePost controller: ', err);
@@ -69,12 +69,12 @@ export const commentOnPost = async (req, res) => {
         const userId = req.user._id;
 
         if(!text){
-            return res.status(400).json( { error: 'Text field is required' } );
+            return res.status(400).json( { error: 'Text komennya mana??' } );
         }
 
         const post = await Post.findById(postId);
         if(!post){
-            return res.status(404).json({error: 'Post not found'});
+            return res.status(404).json({error: 'Post tidak ditemukan'});
         }
 
         const comment = {
@@ -100,14 +100,14 @@ export const likeUnlikePost = async (req, res) => {
         const post = await Post.findById(postId);
 
         if(!post){
-            return res.status(404).json({error: 'Post not found'});
+            return res.status(404).json({error: 'Post tidak ditemukan'});
         }
 
         const userLikedPost = post.likes.includes(userId);
         if(userLikedPost){
             await Post.updateOne({_id: postId}, {$pull: {likes: userId}})
             await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } })
-            res.status(200).json({message: 'Post unliked successfully'});
+            res.status(200).json({message: 'Berhasil tidak menyukai post'});
         }else{
             post.likes.push(userId);
             await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } })
@@ -120,7 +120,7 @@ export const likeUnlikePost = async (req, res) => {
             })
             await notification.save();
 
-            res.status(200).json({message: 'Post liked successfully'});
+            res.status(200).json({message: 'Berhasil menyukai post'});
 
         }
 
@@ -156,7 +156,7 @@ export const getLikedPosts = async (req, res) => {
     const { id:userId } = req.params;
     try{
         const user = await User.findById(userId);
-        if(!user) return res.status(404).json({error: 'User not found'});
+        if(!user) return res.status(404).json({error: 'User tidak ditemukan, nih'});
 
         const likedPosts = await Post.find({_id: {$in: user.likedPosts}}).sort({createdAt: -1})
             .populate({
@@ -180,7 +180,7 @@ export const getFollowingPosts = async (req, res) => {
     try{
         const userId = req.user._id;
         const user = await User.findById(userId);
-        if(!user) return res.status(404).json({error: 'User not found'});
+        if(!user) return res.status(404).json({error: 'User tidak ditemukan, nih'});
 
         const following = user.following;
 
@@ -205,7 +205,7 @@ export const getUserPosts = async (req, res) => {
     try{
         const { username } = req.params;
         const user = await User.findOne({ username });
-        if(!user) return res.status(404).json({error: 'User not found'});
+        if(!user) return res.status(404).json({error: 'User tidak ditemukan, nih'});
 
         const userPosts = await Post.find({user: user._id}).sort({createdAt: -1})
             .populate({
