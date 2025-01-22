@@ -1,6 +1,10 @@
-import RightPanelSkeleton from "../skeletons/RightPanelSkeleton.jsx";
 import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
+
+import useFollow from "../../hooks/useFollow.jsx";
+
+import LoadingDots from "./loading/LoadingDots.jsx";
+import RightPanelSkeleton from "../skeletons/RightPanelSkeleton.jsx";
 
 const RightPanel = () => {
     const {data:suggestedUsers, isLoading} = useQuery({
@@ -18,6 +22,8 @@ const RightPanel = () => {
             }
         }
     })
+
+    const { follow, isPending } = useFollow()
 
     // if(suggestedUsers?.length === 0) return <div className='md:w-1/4 w-0'></div>
 
@@ -55,7 +61,12 @@ const RightPanel = () => {
                                     </div>
                                     <div>
                                         <button className='btn bg-primary text-white hover:bg-primary/70 rounded-full btn-sm'
-                                                onClick={(e) => e.preventDefault()}> Follow </button>
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    follow(user._id);
+                                                }}>
+                                            {isPending ? <LoadingDots size='sm' /> : 'Follow'}
+                                        </button>
                                     </div>
                                 </Link>
                             ))

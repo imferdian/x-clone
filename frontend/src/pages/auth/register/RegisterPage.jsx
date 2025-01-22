@@ -9,6 +9,7 @@ import { MdPassword } from "react-icons/md";
 import { MdDriveFileRenameOutline } from "react-icons/md";
 import {useMutation} from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import LoadingDots from "../../../components/common/loading/LoadingDots.jsx";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -106,11 +107,11 @@ const RegisterPage = () => {
                         />
                     </label>
                     <button className='btn rounded-full btn-primary text-white'>
-                        {isPending ? <span className="loading loading-dots loading-sm"/>  : "Register"}
+                        {isPending ? <LoadingDots size='sm' /> : "Register"}
                     </button>
                 </form>
                 <div className='flex flex-col lg:w-2/3 gap-2 mt-4'>
-                    <p className='text-white text-center'>Sudah punya akun?</p>
+                    <p className='text-white text-center'>Sudah punya akun? Login lah</p>
                     <Link to='/login'>
                         <button className='btn rounded-full btn-primary text-white btn-outline w-full'>Login</button>
                     </Link>

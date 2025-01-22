@@ -7,6 +7,7 @@ import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import LoadingDots from "../../../components/common/loading/LoadingDots.jsx";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -85,7 +86,7 @@ const LoginPage = () => {
                         />
                     </label>
                     <button className='btn rounded-full btn-primary text-white'>
-                        {isPending ? <span className="loading loading-dots loading-sm"/> : 'Login'}
+                        {isPending ? <LoadingDots size='sm' /> : 'Login'}
                     </button>
                 </form>
                 <div className='flex flex-col gap-2 mt-4'>

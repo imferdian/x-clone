@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import LoadingDots from "../../../components/common/loading/LoadingDots.jsx";
 
 const CreatePost = () => {
     const [text, setText] = useState("");
@@ -95,7 +96,7 @@ const CreatePost = () => {
                     </div>
                     <input type='file'  accept='image/*' hidden ref={imgRef} onChange={handleImgChange} />
                     <button className='btn btn-primary rounded-full btn-sm text-white px-4'>
-                        {isPending ? <span className="loading loading-dots loading-sm"/> : "Post"}
+                        {isPending ? <LoadingDots size='sm' /> : "Post"}
                     </button>
                 </div>
             </form>

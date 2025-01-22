@@ -30,7 +30,6 @@ function App() {
             }
         },
         refetchOnWindowFocus: false,
-        // retry: false,
     })
 
     if(isLoading){
