@@ -9,6 +9,7 @@ import DeleteDropdown from "../dropdown/DeleteDropdown.jsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "./loading/LoadingSpinner.jsx";
+import PostTime from "../PostTime.jsx";
 
 const Post = ({ post }) => {
     const [comment, setComment] = useState("");
@@ -28,7 +29,7 @@ const Post = ({ post }) => {
              return data
         },
         onSuccess: () => {
-            toast.success("Post udah dihapus tuh!");
+            toast.success("Post udah kehapus tuh!");
             queryClient.invalidateQueries({queryKey: ['posts']});
         },
         onError: () => {
@@ -41,8 +42,6 @@ const Post = ({ post }) => {
     const isLiked = false;
 
     const isMyPost = authUser._id === post.user._id;
-
-    const formattedDate = "1h";
 
     const isCommenting = false;
 
@@ -77,7 +76,7 @@ const Post = ({ post }) => {
                         <span className='text-gray-700 flex gap-1 text-sm'>
 							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
 							<span>·</span>
-							<span>{formattedDate}</span>
+							<PostTime createdAt={post.createdAt} />
 						</span>
                         {isMyPost && (
                             <span className='flex justify-end flex-1'>

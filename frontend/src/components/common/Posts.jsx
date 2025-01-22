@@ -29,7 +29,7 @@ const Posts = ({ feedType }) => {
 
                 return data;
             }catch (error) {
-
+                throw error;
             }
         }
     })

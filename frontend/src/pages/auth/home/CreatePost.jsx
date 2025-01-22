@@ -2,14 +2,41 @@ import { CiImageOn } from "react-icons/ci";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const CreatePost = () => {
     const [text, setText] = useState("");
     const [img, setImg] = useState(null);
+    const imgRef = useRef(null);
 
+    const {data: authUser} = useQuery({queryKey: ['authUser']});
+    const queryClient = useQueryClient()
 
-    const isPending = false;
-    const isError = false;
+    const {mutate: createPost, isPending,} = useMutation({
+        mutationFn: async ({text, img}) => {
+            const res = await fetch('/api/posts/create', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({text, img}),
+            })
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error || 'Something went wrong!');
+            return data
+        },
+        onSuccess: () => {
+            setText('')
+            setImg(null)
+            toast.success("Berhasil. Makasih udah speak up ;)")
+            queryClient.invalidateQueries({queryKey: ['posts']});
+        },
+        onError: () => {
+            toast.error("Yaahhh. Gagal ngepost :(")
+        }
+    })
+
 
     const data = {
         profileImg: "/avatars/boy1.png",
@@ -17,10 +44,9 @@ const CreatePost = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert("Post created successfully");
+        createPost({text, img})
     };
 
-    const imgRef = useRef(null);
 
     const handleImgChange = (e) => {
         const file = e.target.files[0];
@@ -37,7 +63,7 @@ const CreatePost = () => {
         <div className='flex p-4 pb-1 items-start gap-4 border-b border-gray-700 max-h-max'>
             <div className='avatar'>
                 <div className='w-9 rounded-full'>
-                    <img alt='Profile Img' src={data.profileImg || "/avatar-placeholder.png"} />
+                    <img alt='Profile Img' src={authUser.profileImg || "/avatar-placeholder.png"} />
                 </div>
             </div>
             <form className='flex flex-col w-full max-h-full pt-1' onSubmit={handleSubmit}>
@@ -69,10 +95,9 @@ const CreatePost = () => {
                     </div>
                     <input type='file'  accept='image/*' hidden ref={imgRef} onChange={handleImgChange} />
                     <button className='btn btn-primary rounded-full btn-sm text-white px-4'>
-                        {isPending ? "Posting..." : "Post"}
+                        {isPending ? <span className="loading loading-dots loading-sm"/> : "Post"}
                     </button>
                 </div>
-                {isError && <div className='text-red-500'>Something went wrong</div>}
             </form>
         </div>
     );
