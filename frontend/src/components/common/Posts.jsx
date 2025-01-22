@@ -26,7 +26,6 @@ const Posts = ({ feedType }) => {
                 const data = await res.json();
 
                 if(!res.ok) throw new Error(data.error || 'Something went wrong');
-
                 return data;
             }catch (error) {
                 throw error;
@@ -47,7 +46,8 @@ const Posts = ({ feedType }) => {
                     <PostSkeleton />
                 </div>
             )}
-            {!isLoading && !isRefetching && posts?.length === 0 && <p className='text-center my-4'>Belum ada postingan nih awokawok. Ngepost dong👻</p>}
+            {!isLoading && !isRefetching && posts?.length === 0 && feedType === 'forYou' && <p className='text-center my-4'>Belum ada postingan nih awokawok. Ngepost dong👻</p>}
+            {!isLoading && !isRefetching && posts?.length === 0 && feedType === 'following' && <p className='text-center my-4'>Following kamu belum ada yang ngepost, nih😪</p>}
             {!isLoading && !isRefetching && posts && (
                 <div>
                     {posts.map((post) => (

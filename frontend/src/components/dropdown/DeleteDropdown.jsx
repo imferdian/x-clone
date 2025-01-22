@@ -2,7 +2,7 @@ import {FaEllipsis} from "react-icons/fa6";
 
 const DeleteDropdown = ({ children }) => {
     return (
-        <div className="dropdown">
+        <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="">
                 <FaEllipsis />
             </div>

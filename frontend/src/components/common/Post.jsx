@@ -13,10 +13,11 @@ import LoadingDots from "./loading/LoadingDots.jsx";
 
 const Post = ({ post }) => {
     const [comment, setComment] = useState("");
-
-    const {data:authUser} = useQuery({queryKey: ['authUser']});
-
     const queryClient = useQueryClient()
+    const {data:authUser} = useQuery({queryKey: ['authUser']});
+    const postOwner = post.user;
+    const isLiked = post.likes.includes(authUser._id);
+    const isMyPost = authUser._id === post.user._id;
 
     const {mutate: deletePost, isPending: isDeleting} = useMutation({
         mutationFn: async () => {
@@ -61,12 +62,28 @@ const Post = ({ post }) => {
         }
     })
 
-    const postOwner = post.user;
-    const isLiked = post.likes.includes(authUser._id);
-
-    const isMyPost = authUser._id === post.user._id;
-
-    const isCommenting = false;
+    const {mutate: commentPost, isPending: isCommenting} = useMutation({
+        mutationFn: async () => {
+            const res = await fetch(`/api/posts/comment/${post._id}`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({text: comment})
+            })
+            const data = await res.json()
+            if(!res.ok) throw new Error(data.error || 'Something went wrong');
+            return data;
+        },
+        onSuccess: () => {
+            toast.success('Comment terkirim');
+            setComment('');
+            queryClient.invalidateQueries({queryKey: ['posts']});
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    })
 
     const handleDeletePost = () => {
         deletePost();
@@ -74,6 +91,8 @@ const Post = ({ post }) => {
 
     const handlePostComment = (e) => {
         e.preventDefault();
+        if(isCommenting) return;
+        commentPost();
     };
 
     const handleLikePost = () => {
@@ -106,7 +125,8 @@ const Post = ({ post }) => {
 						</span>
                         {isMyPost && (
                             <span className='flex justify-end flex-1'>
-                                {!isDeleting && <DeleteDropdown>
+                                {!isDeleting &&
+                                <DeleteDropdown>
                                     <li>
                                         <a onClick={handleDeletePost}>Hapus</a>
                                     </li>
@@ -148,15 +168,15 @@ const Post = ({ post }) => {
                             {/* We're using Modal Component from DaisyUI */}
                             <dialog id={`comments_modal${post._id}`} className='modal border-none outline-none '>
                                 <div className='modal-box rounded-md border border-gray-600'>
-                                    <h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
-                                    <div className='flex flex-col gap-3 max-h-60 overflow-auto'>
+                                    <h3 className='font-bold text-lg mb-4'>KOMENTAR</h3>
+                                    <div className='flex flex-col gap-5 max-h-60 overflow-auto'>
                                         {post.comments.length === 0 && (
                                             <p className='text-sm text-slate-500'>
-                                                No comments yet 🤔 Be the first one 😉
+                                                Belum ada yang komen😪
                                             </p>
                                         )}
                                         {post.comments.map((comment) => (
-                                            <div key={comment._id} className='flex gap-2 items-start'>
+                                            <div key={comment._id} className='flex gap-2 items-start border-b border-gray-600 pb-2 '>
                                                 <div className='avatar'>
                                                     <div className='w-8 rounded-full'>
                                                         <img alt='Profile Image'
@@ -164,7 +184,7 @@ const Post = ({ post }) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className='flex flex-col'>
+                                                <div className='flex flex-col gap-1'>
                                                     <div className='flex items-center gap-1'>
                                                         <span className='font-bold'>{comment.user.fullName}</span>
                                                         <span className='text-gray-700 text-sm'>
@@ -175,9 +195,10 @@ const Post = ({ post }) => {
                                                 </div>
                                             </div>
                                         ))}
+
                                     </div>
                                     <form
-                                        className='flex gap-2 items-center mt-4 border-t border-gray-600 pt-2'
+                                        className='flex gap-2 items-center mt-4 pt-2'
                                         onSubmit={handlePostComment}
                                     >
 										<textarea

@@ -38,14 +38,9 @@ const CreatePost = () => {
         }
     })
 
-
-    const data = {
-        profileImg: "/avatars/boy1.png",
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(isPending) return
+        if(isPending) return;
         createPost({text, img})
     };
 
