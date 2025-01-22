@@ -1,15 +1,34 @@
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton.jsx";
-import {USERS_FOR_RIGHT_PANEL} from "../../src/utils/db/dummy.js";
 import {Link} from "react-router-dom";
+import {useQuery} from "@tanstack/react-query";
 
 const RightPanel = () => {
-    const isLoading = false;
+    const {data:suggestedUsers, isLoading} = useQuery({
+        queryKey: ['suggestedUsers'],
+        queryFn: async () => {
+            try{
+                const res = await fetch('api/users/suggested')
+                const data = await res.json();
+
+                if(!res.ok) throw new Error(data.error || 'Something went wrong');
+                return data
+
+            }catch (error) {
+
+            }
+        }
+    })
+
+    // if(suggestedUsers?.length === 0) return <div className='md:w-1/4 w-0'></div>
 
     return (
         <>
             <div className='hidden lg:block my-4 ml-6 w-1/4'>
                 <div className='bg-[#16181C] px-4 py-3 rounded-xl sticky top-2 w-full'>
-                    <p className='font-bold pb-4 text-xl'>Nih, follow juga dong!</p>
+                    {suggestedUsers?.length === 0 ?
+                        <p className='font-semibold pb-4 text-center'>Belum ada user yang bisa di follow</p> :
+                        <p className='font-bold pb-4 text-xl'>Nih, di follow dong!!</p>
+                    }
                     <div className='flex flex-col gap-4'>
                         {/*item*/}
                         {isLoading && (
@@ -21,7 +40,7 @@ const RightPanel = () => {
                             </>
                         )}
                         {!isLoading && (
-                            USERS_FOR_RIGHT_PANEL?.map((user) => (
+                            suggestedUsers?.map((user) => (
                                 <Link to={`/profile/${user.username}`} key={user._id} className='flex items-center justify-between gap-4'>
                                     <div className='flex gap-2 items-center'>
                                         <div className='avatar'>
