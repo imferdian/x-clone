@@ -1,23 +1,56 @@
 import PostSkeleton from "../skeletons/PostSkeleton.jsx";
 import Post from "./Post.jsx";
-import { POSTS } from '../../src/utils/db/dummy.js'
+import {useQuery} from "@tanstack/react-query";
+import {useEffect} from "react";
 
-const Posts = () => {
-    const isLoading = false;
+const Posts = ({ feedType }) => {
+
+    const getPostEndPoint = () => {
+        switch (feedType) {
+            case 'forYou':
+                return '/api/posts/all';
+            case 'following':
+                return '/api/posts/following';
+            default:
+                return '/api/posts/all';
+        }
+    }
+
+    const POST_ENDPOINT = getPostEndPoint()
+
+    const {data: posts, isLoading, refetch, isRefetching} = useQuery({
+        queryKey: ['posts'],
+        queryFn: async () => {
+            try {
+                const res = await fetch(POST_ENDPOINT);
+                const data = await res.json();
+
+                if(!res.ok) throw new Error(data.error || 'Something went wrong');
+
+                return data;
+            }catch (error) {
+
+            }
+        }
+    })
+
+    useEffect(() => {
+        refetch();
+    }, [feedType, refetch])
 
     return (
         <>
-            {isLoading && (
+            {(isLoading || isRefetching) && (
                 <div className='flex flex-col justify-center'>
                     <PostSkeleton />
                     <PostSkeleton />
                     <PostSkeleton />
                 </div>
             )}
-            {!isLoading && POSTS?.length === 0 && <p className='text-center my-4'>Belum ada postingan nih awokawok. Ngepost dong👻</p>}
-            {!isLoading && POSTS && (
+            {!isLoading && !isRefetching && posts?.length === 0 && <p className='text-center my-4'>Belum ada postingan nih awokawok. Ngepost dong👻</p>}
+            {!isLoading && !isRefetching && posts && (
                 <div>
-                    {POSTS.map((post) => (
+                    {posts.map((post) => (
                         <Post key={post._id} post={post} />
                     ))}
                 </div>
