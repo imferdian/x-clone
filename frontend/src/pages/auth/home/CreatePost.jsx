@@ -45,6 +45,7 @@ const CreatePost = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if(isPending) return
         createPost({text, img})
     };
 
@@ -69,21 +70,23 @@ const CreatePost = () => {
             </div>
             <form className='flex flex-col w-full max-h-full pt-1' onSubmit={handleSubmit}>
 				<textarea
-                    className='textarea w-full p-0 text-xl resize-none border-none focus:outline-none bg-transparent'
+                    className=' border-none textarea w-full p-0 text-xl resize-none focus:outline-none bg-transparent'
                     placeholder='Ada cerita? tulis sini aja brok!'
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
                 {img && (
-                    <div className='relative w-72 mx-auto'>
-                        <IoCloseSharp
-                            className='absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer'
-                            onClick={() => {
-                                setImg(null);
-                                imgRef.current.value = null;
-                            }}
-                        />
-                        <img alt='Image Post' src={img} className='w-full mx-auto h-72 object-contain rounded' />
+                    <div className='mt-5 mr-10'>
+                        <div className='relative w-fit mx-auto'>
+                            <IoCloseSharp
+                                className='absolute -top-3 -right-3 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer'
+                                onClick={() => {
+                                    setImg(null);
+                                    imgRef.current.value = null;
+                                }}
+                            />
+                            <img alt='Image Post' src={img} className='w-full mx-auto h-72 object-contain rounded' />
+                        </div>
                     </div>
                 )}
                 <div className='flex justify-between py-2'>
