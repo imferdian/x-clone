@@ -66,13 +66,21 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const {username, password} = req.body;
+
         const user = await User.findOne({username})
         const isPasswordValid = await bcrypt.compare(password, user?.password || '');
 
-        if(!user || !isPasswordValid) {
+        if(!user) {
             return res.status(400).json({
                 success: false,
-                error: 'Username atau password SALAH!!'
+                error: 'Username SALAH!!'
+            });
+        }
+
+        if(!isPasswordValid) {
+            return res.status(400).json({
+                success: false,
+                error: 'Password SALAH!!'
             });
         }
 

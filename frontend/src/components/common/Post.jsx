@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 import LoadingSpinner from "./loading/LoadingSpinner.jsx";
 import PostTime from "../PostTime.jsx";
 import LoadingDots from "./loading/LoadingDots.jsx";
+import PostHeader from "../PostHeader.jsx";
+import FullnameAndUsername from "../FullnameAndUsername.jsx";
 
 const Post = ({ post }) => {
     const [comment, setComment] = useState("");
@@ -105,7 +107,7 @@ const Post = ({ post }) => {
             <div className='flex gap-2 items-start p-4 border-b border-gray-700'>
 
                 {/* Profile Image */}
-                <div className='avatar'>
+                <div className='avatar pt-2'>
                     <Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden'>
                         <img alt='Profile Image' src={postOwner.profileImg || "/avatar-placeholder.png"} />
                     </Link>
@@ -115,16 +117,13 @@ const Post = ({ post }) => {
                 {/* Username and Full Name */}
                 <div className='flex flex-col flex-1'>
                     <div className='flex gap-2 items-center'>
-                        <Link to={`/profile/${postOwner.username}`} className='font-bold'>
-                            {postOwner.fullName}
-                        </Link>
-                        <span className='text-gray-700 flex gap-1 text-sm'>
-							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
-							<span>·</span>
-							<PostTime createdAt={post.createdAt} />
-						</span>
+                        <FullnameAndUsername
+                            fullName={postOwner.fullName}
+                            username={postOwner.username}
+                            createdAt={postOwner.createdAt}
+                        />
                         {isMyPost && (
-                            <span className='flex justify-end flex-1'>
+                            <span className='flex ml-auto'>
                                 {!isDeleting &&
                                 <DeleteDropdown>
                                     <li>

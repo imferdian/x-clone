@@ -11,6 +11,7 @@ import {useQuery} from "@tanstack/react-query";
 
 import LoadingType from "./components/common/loading/LoadingType.jsx";
 import LoadingBear from "./components/common/loading/LoadingBear.jsx";
+import Menubar from "./components/common/Menubar.jsx";
 
 
 function App() {
@@ -23,7 +24,6 @@ function App() {
                 const data = await res.json();
                 if(data.error) return null;
                 if (!res.ok || data.error) throw new Error(data.error || 'Something went wrong');
-                console.log('authUser is here: ', data);
                 return data;
             }catch (error) {
                 throw new Error(error);
@@ -42,9 +42,9 @@ function App() {
     }
 
     return (
-        <div className='flex max-w-7xl mx-auto'>
+        <div className='flex max-w-7xl mx-auto overflow-y-auto md:overflow-y-visible scrollbar-hide'>
             {/* Common component, karena tidak berada di dalam Routes Tag */}
-            { authUser && <Sidebar/> }
+            { authUser && <Menubar/> }
             <Routes>
                 <Route path="/" element={ authUser ? <HomePage/> : <Navigate to='/login' />}/>
                 <Route path="/login" element={ !authUser ?  <LoginPage/> : <Navigate to='/' /> }/>

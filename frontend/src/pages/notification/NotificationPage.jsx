@@ -4,49 +4,58 @@ import LoadingSpinner from "../../components/common/loading/LoadingSpinner";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const NotificationPage = () => {
-    const isLoading = false;
-    const notifications = [
-        {
-            _id: "1",
-            from: {
-                _id: "1",
-                username: "johndoe",
-                profileImg: "/avatars/boy2.png",
-            },
-            type: "follow",
-        },
-        {
-            _id: "2",
-            from: {
-                _id: "2",
-                username: "janedoe",
-                profileImg: "/avatars/girl1.png",
-            },
-            type: "like",
-        },
-    ];
+    const queryClient = useQueryClient();
+    const {data:notifications, isLoading} = useQuery({
+        queryKey: ['notifications'],
+        queryFn: async () => {
+            try {
+                const res = await fetch('/api/notifications')
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || "Something went wrong");
+                return data;
+            }catch (error) {
+                throw new Error(error.message);
+            }
+        }
+    })
 
-    const deleteNotifications = () => {
-        alert("All notifications deleted");
-    };
-
+    const {mutate: deleteNotifications, isPending } = useMutation({
+        mutationFn: async () => {
+            const res = await fetch(`/api/notifications`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error || "Something went wrong");
+            return data;
+        },
+        onSuccess: ()=> {
+            toast.success('Berhasil menghapus semua pesan');
+            queryClient.invalidateQueries({queryKey: ['notifications']})
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    })
+    
     return (
         <>
-            <div className='flex-[4_4_0] mr-auto border-r border-gray-700 min-h-screen'>
+            <div className='flex-[4_4_0] mr-auto border-x border-gray-700 min-h-screen md:mb-0 mb-[52px]'>
                 <div className='flex justify-between items-center p-4 border-b border-gray-700'>
                     <p className='font-bold'>Notifications</p>
-                    <div className='dropdown '>
+                    <div className='dropdown dropdown-end'>
                         <div tabIndex={0} role='button' className='m-1'>
                             <IoSettingsOutline className='w-4' />
                         </div>
                         <ul
                             tabIndex={0}
-                            className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-lg w-52'
+                            className='dropdown-content z-[1] menu border border-gray-700 p-2 shadow bg-base-100 rounded-lg w-52'
                         >
                             <li>
-                                <a onClick={deleteNotifications}>Delete all notifications</a>
+                                <a onClick={deleteNotifications}>Hapus Semua Notifikasi</a>
                             </li>
                         </ul>
                     </div>
@@ -56,7 +65,7 @@ const NotificationPage = () => {
                         <LoadingSpinner size='lg' />
                     </div>
                 )}
-                {notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
+                {notifications?.length === 0 && <div className='text-center p-4 font-bold'>Belum ada notifikasi 🤔</div>}
                 {notifications?.map((notification) => (
                     <div className='border-b border-gray-700' key={notification._id}>
                         <div className='flex gap-2 p-4'>

@@ -3,7 +3,7 @@ import Post from "./Post.jsx";
 import {useQuery} from "@tanstack/react-query";
 import {useEffect} from "react";
 
-const Posts = ({ feedType }) => {
+const Posts = ({ feedType, username, userId }) => {
 
     const getPostEndPoint = () => {
         switch (feedType) {
@@ -11,6 +11,10 @@ const Posts = ({ feedType }) => {
                 return '/api/posts/all';
             case 'following':
                 return '/api/posts/following';
+            case 'posts':
+                return `/api/posts/user/${username}`;
+            case 'likes':
+                return `/api/posts/likes/${userId}`;
             default:
                 return '/api/posts/all';
         }
@@ -35,7 +39,7 @@ const Posts = ({ feedType }) => {
 
     useEffect(() => {
         refetch();
-    }, [feedType, refetch])
+    }, [feedType, refetch, username])
 
     return (
         <>
@@ -48,6 +52,8 @@ const Posts = ({ feedType }) => {
             )}
             {!isLoading && !isRefetching && posts?.length === 0 && feedType === 'forYou' && <p className='text-center my-4'>Belum ada postingan nih awokawok. Ngepost dong👻</p>}
             {!isLoading && !isRefetching && posts?.length === 0 && feedType === 'following' && <p className='text-center my-4'>Following kamu belum ada yang ngepost, nih😪</p>}
+            {!isLoading && !isRefetching && posts?.length === 0 && feedType === 'posts' && <p className='text-center my-4'>Belum ada postingan, nih🙄</p>}
+            {!isLoading && !isRefetching && posts?.length === 0 && feedType === 'likes' && <p className='text-center my-4'>Belum ada ngelike postingan, nih😒</p>}
             {!isLoading && !isRefetching && posts && (
                 <div>
                     {posts.map((post) => (

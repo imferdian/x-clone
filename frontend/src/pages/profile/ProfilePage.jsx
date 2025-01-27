@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import {useEffect, useRef, useState} from "react";
+import {Link, useParams} from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
@@ -12,29 +12,48 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import {BiLogOut} from "react-icons/bi";
+import useLogout from "../../hooks/useLogout.jsx";
+import {useQuery} from "@tanstack/react-query";
+import {formatMemberSinceDate} from "../../src/utils/date/index.js";
 
 const ProfilePage = () => {
     const [coverImg, setCoverImg] = useState(null);
     const [profileImg, setProfileImg] = useState(null);
     const [feedType, setFeedType] = useState("posts");
 
+    const { logout } = useLogout();
+
     const coverImgRef = useRef(null);
     const profileImgRef = useRef(null);
 
-    const isLoading = false;
+
     const isMyProfile = true;
 
-    const user = {
-        _id: "1",
-        fullName: "Perdiansyah",
-        username: "ferdian",
-        profileImg: "/avatars/boy2.png",
-        coverImg: "/cover.png",
-        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        link: "instagram.com/whosferdie_",
-        following: ["1", "2", "3"],
-        followers: ["1", "2", "3"],
-    };
+    const {username} = useParams();
+    const { data, isLoading, isRefetching, refetch} = useQuery({
+        queryKey: ["userProfile"],
+        queryFn: async () => {
+            try {
+                const res = await fetch(`/api/users/profile/${username}`);
+                const data = await res.json();
+                if (!res.ok) {
+                    console.error("API Error:", await res.text());
+                    throw new Error(data.error || "Something went wrong");
+                }
+                return data;
+            } catch (error) {
+                throw new Error(error);
+            }
+        },
+    });
+    // console.log(username)
+    // console.log(data.user)
+    const user = data?.user;
+    console.log(user);
+
+    const memberSinceDate = formatMemberSinceDate(user?.createdAt)
+
 
     const handleImgChange = (e, state) => {
         const file = e.target.files[0];
@@ -48,24 +67,39 @@ const ProfilePage = () => {
         }
     };
 
+    useEffect( () => {
+        refetch()
+    }, [username, refetch]);
+
     return (
         <>
-            <div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
+            <div className='flex-[4_4_0] border-x border-gray-700 min-h-screen md:mb-0 mb-[52px] min-w-0'>
                 {/* HEADER */}
-                {isLoading && <ProfileHeaderSkeleton />}
-                {!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+                {( isLoading || isRefetching )&& <ProfileHeaderSkeleton />}
+                {!isLoading && !isRefetching && !user && <p className='text-center text-lg mt-4'>User not found</p>}
                 <div className='flex flex-col'>
-                    {!isLoading && user && (
+                    {!isLoading && !isRefetching && user && (
                         <>
-                            <div className='flex gap-10 px-4 py-2 items-center'>
-                                <Link to='/'>
-                                    <FaArrowLeft className='w-4 h-4' />
-                                </Link>
-                                <div className='flex flex-col'>
-                                    <p className='font-bold text-lg'>{user?.fullName}</p>
-                                    <span className='text-sm text-slate-500'>{POSTS?.length} posts</span>
+                                {/* Top Header */}
+                            <div className='flex items-center'>
+                                <div className=' flex gap-10 px-4 py-2 items-center'>
+                                    <Link to='/'>
+                                        <FaArrowLeft className='w-4 h-4' />
+                                    </Link>
+                                    <div className='flex flex-col'>
+                                        <p className='font-bold text-lg'>{user?.fullName}</p>
+                                        <span className='text-sm text-slate-500'>{POSTS?.length} posts</span>
+                                    </div>
+                                </div>
+                                <div className='ml-auto mr-6 md:hidden'>
+                                    <BiLogOut  className='w-5 h-5 cursor-pointer'
+                                               onClick={(e) => {
+                                                   e.preventDefault()
+                                                   logout();
+                                               }}/>
                                 </div>
                             </div>
+                            {/* End Top Header */}
                             {/* COVER IMG */}
                             <div className='relative group/cover'>
                                 <img
@@ -96,11 +130,12 @@ const ProfilePage = () => {
                                     ref={profileImgRef}
                                     onChange={(e) => handleImgChange(e, "profileImg")}
                                 />
+
                                 {/* USER AVATAR */}
-                                <div className='avatar absolute -bottom-16 left-4 group'>
-                                    <div className='w-32 relative '>
+                                <div className='avatar absolute -bottom-12 md:-bottom-16 left-4 group'>
+                                    <div className='w-28 md:w-32 relative '>
                                         <img alt='Profile Image' src={profileImg || user?.profileImg || "/avatar-placeholder.png"} className='rounded-full'/>
-                                        <div className='absolute bottom-5 right-0 p-1 bg-primary rounded-full group-hover:opacity-100 opacity-0 cursor-pointer z-[999]'>
+                                        <div className='absolute bottom-1 md:bottom-3 right-0 p-1 bg-primary rounded-full group-hover:opacity-100 opacity-0 cursor-pointer z-[999]'>
                                             {isMyProfile && (
                                                 <MdEdit
                                                     className='w-4 h-4 text-white'
@@ -111,6 +146,7 @@ const ProfilePage = () => {
                                     </div>
                                 </div>
                             </div>
+
                             <div className='flex justify-end px-4 mt-5'>
                                 {isMyProfile && <EditProfileModal />}
                                 {!isMyProfile && (
@@ -156,16 +192,16 @@ const ProfilePage = () => {
                                     )}
                                     <div className='flex gap-2 items-center'>
                                         <IoCalendarOutline className='w-4 h-4 text-slate-500' />
-                                        <span className='text-sm text-slate-500'>Joined July 2021</span>
+                                        <span className='text-sm text-slate-500'>{memberSinceDate}</span>
                                     </div>
                                 </div>
                                 <div className='flex gap-2'>
                                     <div className='flex gap-1 items-center'>
-                                        <span className='font-bold text-sm'>{user?.following.length}</span>
+                                        <span className='font-bold text-sm'>{user?.following?.length}</span>
                                         <span className='text-slate-500 text-sm'>Following</span>
                                     </div>
                                     <div className='flex gap-1 items-center'>
-                                        <span className='font-bold text-sm'>{user?.followers.length}</span>
+                                        <span className='font-bold text-sm'>{user?.followers?.length}</span>
                                         <span className='text-slate-500 text-sm'>Followers</span>
                                     </div>
                                 </div>
@@ -186,14 +222,14 @@ const ProfilePage = () => {
                                 >
                                     Likes
                                     {feedType === "likes" && (
-                                        <div className='absolute bottom-0 w-10  h-1 rounded-full bg-primary' />
+                                        <div className='absolute bottom-0 w-10 h-1 rounded-full bg-primary' />
                                     )}
                                 </div>
                             </div>
                         </>
                     )}
 
-                    <Posts />
+                    <Posts feedType={feedType} username={username} userId={user?._id} />
                 </div>
             </div>
         </>
