@@ -8,6 +8,7 @@ import { MdPassword } from "react-icons/md";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingDots from "../../../components/common/loading/LoadingDots.jsx";
+import GoogleSVG from "../../../components/svgs/GoogleSVG.jsx";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -94,6 +95,11 @@ const LoginPage = () => {
                     <Link to='/register'>
                         <button className='btn rounded-full btn-primary text-white btn-outline w-full'>Sign up</button>
                     </Link>
+                    <span className='text-center'>or</span>
+                    <button className='btn rounded-full btn-outline'>
+                        <GoogleSVG className=' w-7 '/>
+                        Login with google
+                    </button>
                 </div>
             </div>
         </div>

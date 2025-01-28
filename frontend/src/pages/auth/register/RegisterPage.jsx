@@ -10,6 +10,7 @@ import { MdDriveFileRenameOutline } from "react-icons/md";
 import {useMutation} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingDots from "../../../components/common/loading/LoadingDots.jsx";
+import GoogleSVG from "../../../components/svgs/GoogleSVG.jsx";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -115,6 +116,11 @@ const RegisterPage = () => {
                     <Link to='/login'>
                         <button className='btn rounded-full btn-primary text-white btn-outline w-full'>Login</button>
                     </Link>
+                    <span className='text-center'>or</span>
+                    <button className='btn rounded-full btn-outline'>
+                        <GoogleSVG className=' w-7 ' />
+                        Login with google
+                    </button>
                 </div>
             </div>
         </div>

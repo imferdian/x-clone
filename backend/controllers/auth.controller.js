@@ -138,5 +138,10 @@ export const getMe = async (req, res) => {
             message: err.message,
         })
     }
+}
+
+export const googleLogin = async (req, res) => {
+
+
 
 }
