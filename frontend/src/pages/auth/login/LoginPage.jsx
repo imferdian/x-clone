@@ -95,11 +95,11 @@ const LoginPage = () => {
                     <Link to='/register'>
                         <button className='btn rounded-full btn-primary text-white btn-outline w-full'>Sign up</button>
                     </Link>
-                    <span className='text-center'>or</span>
-                    <button className='btn rounded-full btn-outline'>
-                        <GoogleSVG className=' w-7 '/>
-                        Login with google
-                    </button>
+                    {/*<span className='text-center'>or</span>*/}
+                    {/*<button className='btn rounded-full btn-outline'>*/}
+                    {/*    <GoogleSVG className=' w-7 '/>*/}
+                    {/*    Login with google*/}
+                    {/*</button>*/}
                 </div>
             </div>
         </div>
