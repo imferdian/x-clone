@@ -4,7 +4,7 @@ import {protectRoute} from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
-router.get('/google', googleLogin)
+// router.get('/google', googleLogin)
 router.get('/me', protectRoute, getMe)
 router.post('/register', register)
 router.post('/login', login)
