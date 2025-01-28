@@ -8,9 +8,7 @@ import DeleteDropdown from "../dropdown/DeleteDropdown.jsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "./loading/LoadingSpinner.jsx";
-import PostTime from "../PostTime.jsx";
 import LoadingDots from "./loading/LoadingDots.jsx";
-import PostHeader from "../PostHeader.jsx";
 import FullnameAndUsername from "../FullnameAndUsername.jsx";
 
 const Post = ({ post }) => {
@@ -108,7 +106,7 @@ const Post = ({ post }) => {
 
                 {/* Profile Image */}
                 <div className='avatar pt-2'>
-                    <Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden'>
+                    <Link to={`/profile/${postOwner.username}`} className='w-8 h-8 rounded-full overflow-hidden'>
                         <img alt='Profile Image' src={postOwner.profileImg || "/avatar-placeholder.png"} />
                     </Link>
                 </div>
