@@ -118,7 +118,7 @@ const Post = ({ post }) => {
                         <FullnameAndUsername
                             fullName={postOwner.fullName}
                             username={postOwner.username}
-                            createdAt={postOwner.createdAt}
+                            createdAt={post.createdAt}
                         />
                         {isMyPost && (
                             <span className='flex ml-auto'>
