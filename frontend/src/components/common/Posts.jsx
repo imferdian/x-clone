@@ -41,6 +41,8 @@ const Posts = ({ feedType, username, userId }) => {
         refetch();
     }, [feedType, refetch, username])
 
+
+
     return (
         <>
             {(isLoading || isRefetching) && (

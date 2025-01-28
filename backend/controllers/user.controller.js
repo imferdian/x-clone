@@ -1,6 +1,8 @@
 // Model Database
 import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
+import Post from "../models/post.model.js";
+
 
 import { v2 as cloudinary } from 'cloudinary';
 import bcrypt from "bcryptjs";
@@ -14,7 +16,10 @@ export const getUserProfile = async (req, res) => {
         if(!user) {
             return res.status(404).json({error: 'User not found'});
         }
-        res.status(200).json({user});
+
+        const postCount = await Post.countDocuments({ user: user._id });
+
+        res.status(200).json({user, postCount});
 
     }catch (err) {
         console.log('Error in getUserProfile: ', err.message)
