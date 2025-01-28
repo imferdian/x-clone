@@ -11,11 +11,11 @@ import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import {BiLogOut} from "react-icons/bi";
 import useLogout from "../../hooks/useLogout.jsx";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {formatMemberSinceDate} from "../../src/utils/date/index.js";
-import toast from "react-hot-toast";
 import useFollow from "../../hooks/useFollow.jsx";
 import LoadingDots from "../../components/common/loading/LoadingDots.jsx";
+import useUpdateUserProfile from "../../hooks/useUpdateUserProfile.jsx";
 
 const ProfilePage = () => {
     const [coverImg, setCoverImg] = useState(null);
@@ -28,8 +28,6 @@ const ProfilePage = () => {
     const profileImgRef = useRef(null);
 
     const {username} = useParams();
-
-    const queryClient = useQueryClient()
 
     const {follow, isPending} = useFollow()
 
@@ -65,33 +63,7 @@ const ProfilePage = () => {
         }
     };
 
-    const { mutate: updateProfile, isPending: isUpdatingProfile } = useMutation({
-        mutationFn: async () => {
-            const res = await fetch(`/api/users/update`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    coverImg,
-                    profileImg,
-                })
-            });
-            const data = await res.json()
-            if(!res.ok) throw new Error(data.error || 'Something went wrong');
-            return data;
-        },
-        onSuccess: () => {
-            toast.success("Berhasil mengupdate profile");
-            Promise.all([
-                queryClient.invalidateQueries({queryKey: ['authUser']}),
-                queryClient.invalidateQueries({queryKey: ['userProfile']}),
-            ])
-        },
-        onError: (error) => {
-            toast.error(error.message)
-        }
-    })
+    const {updateProfile, isUpdatingProfile} = useUpdateUserProfile()
 
     useEffect( () => {
         refetch()
@@ -102,9 +74,12 @@ const ProfilePage = () => {
         follow(user._id);
     }
 
-    function handleUpdateProfileButton() {
+    const handleUpdateProfileButton = async () => {
         if(isUpdatingProfile) return;
-        updateProfile();
+        await updateProfile({coverImg, profileImg});
+
+        setCoverImg(null);
+        setProfileImg(null);
     }
 
     // Handle loading state
@@ -114,8 +89,6 @@ const ProfilePage = () => {
         )
     }
     const user = data?.user;
-    console.log(user);
-
     const memberSinceDate = formatMemberSinceDate(user?.createdAt)
     const isMyProfile = authUser._id === user._id
     const amIFollowing = authUser?.following.includes(user?._id)
