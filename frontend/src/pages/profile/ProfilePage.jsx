@@ -88,16 +88,16 @@ const ProfilePage = () => {
             <ProfileHeaderSkeleton />
         )
     }
-    const user = data?.user;
-    const memberSinceDate = formatMemberSinceDate(user?.createdAt)
-    const isMyProfile = authUser._id === user._id
-    const amIFollowing = authUser?.following.includes(user?._id)
-
     // Handle error state
     if (isError) return <div>Error loading data</div>;
 
     // Handle case when data is undefined
     if (!data) return <div>No data found</div>;
+
+    const user = data?.user;
+    const memberSinceDate = formatMemberSinceDate(user?.createdAt)
+    const isMyProfile = authUser._id === user._id
+    const amIFollowing = authUser?.following.includes(user?._id)
 
 
     return (
